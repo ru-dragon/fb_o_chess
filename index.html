@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chess.com Player Ratings</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        .form-container {
+            flex: 1;
+        }
+        .leaderboard-container {
+            flex: 1;
+            padding-left: 20px;
+        }
+        .tabs {
+            display: flex;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .tab {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            background-color: #f1f1f1;
+        }
+        .tab.active {
+            background-color: #ffffff;
+            border-bottom: 1px solid #ffffff;
+        }
+        .tab-content {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <script>
+        function showTab(ratingType) {
+            var tabs = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            document.getElementById(ratingType).classList.add('active');
+
+            var tabButtons = document.getElementsByClassName('tab');
+            for (var i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            document.getElementById(ratingType + '-tab').classList.add('active');
+        }
+    </script>
+</head>
+<body onload="showTab('blitz')">
+    <div class="container">
+        <div class="form-container">
+            <h1>Chess.com Player Ratings</h1>
+            <form method="POST">
+                <label for="username">Enter Chess.com Username:</label>
+                <input type="text" id="username" name="username" required>
+                <button type="submit">Get Ratings</button>
+            </form>
+            
+            {% if error_message %}
+                <p style="color: red;">{{ error_message }}</p>
+            {% endif %}
+
+            {% if ratings %}
+                <h2>Ratings for {{ request.form['username'] }}:</h2>
+                <ul>
+                    {% for category, rating in ratings.items() %}
+                        <li>{{ category }}: {{ rating }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="leaderboard-container">
+            <h2>Leaderboard</h2>
+            <div class="tabs">
+                <div id="blitz-tab" class="tab" onclick="showTab('blitz')">Blitz</div>
+                <div id="rapid-tab" class="tab" onclick="showTab('rapid')">Rapid</div>
+                <div id="bullet-tab" class="tab" onclick="showTab('bullet')">Bullet</div>
+            </div>
+            <div id="blitz" class="tab-content">
+                <ul>
+                    {% for user in leaderboard_blitz %}
+                        <li>{{ loop.index }}. {{ user.username }}: {{ user.rating }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="rapid" class="tab-content">
+                <ul>
+                    {% for user in leaderboard_rapid %}
+                        <li>{{ loop.index }}. {{ user.username }}: {{ user.rating }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="bullet" class="tab-content">
+                <ul>
+                    {% for user in leaderboard_bullet %}
+                        <li>{{ loop.index }}. {{ user.username }}: {{ user.rating }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
